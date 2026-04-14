@@ -1,1 +1,293 @@
-/* You can add global styles to this file, and also import other style files */
+/* ── Google Fonts ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary: #1a56db;
+  --primary-dark: #1341b0;
+  --danger: #e02424;
+  --success: #057a55;
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text: #1a202c;
+  --muted: #718096;
+  --radius: 10px;
+  --shadow: 0 2px 16px rgba(0,0,0,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* ── Navbar ───────────────────────────────────────────── */
+.navbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+}
+.navbar .brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--primary);
+  text-decoration: none;
+}
+.nav-links { display: flex; align-items: center; gap: 1.5rem; }
+.nav-links a { text-decoration: none; color: var(--text); font-weight: 500; transition: color .2s; }
+.nav-links a:hover { color: var(--primary); }
+
+/* ── Buttons ──────────────────────────────────────────── */
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: .6rem 1.4rem;
+  border-radius: var(--radius);
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+.btn-secondary {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: .6rem 1.4rem;
+  border-radius: var(--radius);
+  font-family: 'Sora', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  padding: .5rem 1.2rem;
+  border-radius: var(--radius);
+  font-family: 'Sora', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all .2s;
+}
+.btn-outline:hover { background: var(--primary); color: white; }
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: .6rem 1.4rem;
+  border-radius: var(--radius);
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1.5px solid var(--danger);
+  color: var(--danger);
+  padding: .4rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  font-weight: 500;
+}
+
+.btn-sm { padding: .3rem .8rem; font-size: .85rem; }
+
+/* ── Forms ────────────────────────────────────────────── */
+.form-control {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: .6rem .9rem;
+  font-family: 'Sora', sans-serif;
+  font-size: .95rem;
+  outline: none;
+  transition: border-color .2s;
+}
+.form-control:focus { border-color: var(--primary); }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; font-weight: 500; margin-bottom: .4rem; font-size: .9rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* ── Auth pages ───────────────────────────────────────── */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+.auth-card {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+}
+.auth-card h2 { font-size: 1.8rem; margin-bottom: .3rem; }
+.auth-card .subtitle { color: var(--muted); margin-bottom: 1.5rem; }
+.switch-link { text-align: center; margin-top: 1rem; color: var(--muted); font-size: .9rem; }
+.switch-link a { color: var(--primary); }
+
+/* ── Feedback ─────────────────────────────────────────── */
+.error-box {
+  background: #fde8e8;
+  color: var(--danger);
+  border: 1px solid #f8b4b4;
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: .9rem;
+}
+.success-box {
+  background: #def7ec;
+  color: var(--success);
+  border: 1px solid #84e1bc;
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+}
+.loading { text-align: center; color: var(--muted); padding: 2rem; }
+.empty-state { color: var(--muted); text-align: center; padding: 2rem; font-size: .95rem; }
+
+/* ── Page header ──────────────────────────────────────── */
+.page-title { font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; }
+
+/* ── Search bar ───────────────────────────────────────── */
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-bottom: 2rem;
+  background: var(--surface);
+  padding: 1.2rem;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.search-bar .form-control { flex: 1; min-width: 140px; }
+
+/* ── Items grid ───────────────────────────────────────── */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.item-card {
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+  position: relative;
+}
+.item-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.item-card.claimed { opacity: .65; }
+.item-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: .25rem .7rem;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 700;
+}
+.item-badge.found { background: #def7ec; color: #057a55; }
+.item-badge.lost { background: #fde8e8; color: #e02424; }
+.item-image { width: 100%; height: 180px; object-fit: cover; }
+.item-body { padding: 1rem; }
+.item-body h3 { margin-bottom: .4rem; font-size: 1.1rem; }
+.item-body p { color: var(--muted); font-size: .9rem; margin-bottom: .75rem; }
+.item-meta { display: flex; gap: 1rem; font-size: .82rem; color: var(--muted); margin-bottom: .75rem; }
+
+/* ── Item detail ──────────────────────────────────────── */
+.detail-card {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  max-width: 780px;
+  margin: 0 auto;
+}
+.detail-header { margin-bottom: 1.5rem; }
+.detail-header h1 { font-size: 2rem; margin-top: .5rem; }
+.detail-image { width: 100%; max-height: 360px; object-fit: cover; border-radius: 12px; margin-bottom: 1.5rem; }
+.detail-meta p { margin-bottom: .6rem; }
+.badge { padding: .3rem .8rem; border-radius: 20px; font-size: .8rem; font-weight: 700; }
+.badge.found { background: #def7ec; color: #057a55; }
+.badge.lost { background: #fde8e8; color: #e02424; }
+.claimed-badge {
+  background: #e3e8ef;
+  color: var(--muted);
+  padding: .3rem .8rem;
+  border-radius: 20px;
+  font-size: .8rem;
+  font-weight: 700;
+  margin-left: .5rem;
+}
+.claim-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.claim-section h3 { margin-bottom: 1rem; }
+.action-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+/* ── Item form ────────────────────────────────────────── */
+.form-card {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.form-card h2 { margin-bottom: 1.5rem; font-size: 1.6rem; }
+.form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+
+/* ── Dashboard ────────────────────────────────────────── */
+.dashboard-section { margin-bottom: 3rem; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.section-header h2 { font-size: 1.4rem; }
+.items-table { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.table-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.table-row:last-child { border-bottom: none; }
+.item-title { flex: 1; font-weight: 500; }
+.row-actions { display: flex; gap: .5rem; }
+.claims-list { display: flex; flex-direction: column; gap: 1rem; }
+.claim-card { background: var(--surface); border-radius: 12px; padding: 1.2rem; box-shadow: var(--shadow); }
+.claim-status { padding: .25rem .7rem; border-radius: 20px; font-size: .75rem; font-weight: 700; }
+.claim-status.pending { background: #fef3c7; color: #92400e; }
+.claim-status.approved { background: #def7ec; color: #057a55; }
+.claim-status.rejected { background: #fde8e8; color: #e02424; }

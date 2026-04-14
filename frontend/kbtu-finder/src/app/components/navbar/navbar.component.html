@@ -1,0 +1,14 @@
+<nav class="navbar">
+  <a routerLink="/" class="brand">🔍 KBTU Lost &amp; Found</a>
+  <div class="nav-links">
+    <a routerLink="/items">Browse Items</a>
+    @if (auth.isLoggedIn()) {
+      <a routerLink="/items/new">Post Item</a>
+      <a routerLink="/dashboard">Dashboard</a>
+      <button (click)="logout()" class="btn-logout">Logout</button>
+    } @else {
+      <a routerLink="/login">Login</a>
+      <a routerLink="/register">Register</a>
+    }
+  </div>
+</nav>

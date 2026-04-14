@@ -1,0 +1,47 @@
+<div class="page-container">
+  <h1 class="page-title">My Dashboard</h1>
+  @if (error) { <div class="error-box">{{ error }}</div> }
+
+  <section class="dashboard-section">
+    <div class="section-header">
+      <h2>My Posted Items</h2>
+      <a routerLink="/items/new" class="btn-primary">+ Post New Item</a>
+    </div>
+
+    @if (loading) { <div class="loading">Loading...</div> }
+
+    <div class="items-table">
+      @for (item of myItems; track item.id) {
+        <div class="table-row">
+          <span class="badge" [class.found]="item.status === 'found'" [class.lost]="item.status === 'lost'">
+            {{ item.status }}
+          </span>
+          <span class="item-title">{{ item.title }}</span>
+          <span>{{ item.location_name }}</span>
+          <span>{{ item.date_posted | date:'shortDate' }}</span>
+          <div class="row-actions">
+            <a [routerLink]="['/items', item.id, 'edit']" class="btn-outline btn-sm">Edit</a>
+            <button (click)="deleteItem(item.id)" class="btn-danger btn-sm">Delete</button>
+          </div>
+        </div>
+      } @empty {
+        <p class="empty-state">You haven't posted any items yet.</p>
+      }
+    </div>
+  </section>
+
+  <section class="dashboard-section">
+    <h2>My Claim Requests</h2>
+    <div class="claims-list">
+      @for (claim of myClaims; track claim.id) {
+        <div class="claim-card">
+          <p><strong>Item:</strong> {{ claim.item_title }}</p>
+          <p><strong>Message:</strong> {{ claim.message }}</p>
+          <span class="claim-status" [class]="claim.status">{{ claim.status | uppercase }}</span>
+        </div>
+      } @empty {
+        <p class="empty-state">No claim requests yet.</p>
+      }
+    </div>
+  </section>
+</div>

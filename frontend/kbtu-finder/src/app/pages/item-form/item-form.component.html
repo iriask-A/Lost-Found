@@ -1,0 +1,59 @@
+<div class="page-container">
+  <div class="form-card">
+    <h2>{{ isEdit ? 'Edit Item' : 'Post New Item' }}</h2>
+    @if (error) { <div class="error-box">{{ error }}</div> }
+
+    <div class="form-group">
+      <label>Title *</label>
+      <input type="text" [(ngModel)]="form.title" class="form-control" placeholder="What is the item?" />
+    </div>
+    <div class="form-group">
+      <label>Description *</label>
+      <textarea [(ngModel)]="form.description" rows="4" class="form-control" placeholder="Describe the item..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Status</label>
+        <select [(ngModel)]="form.status" class="form-control">
+          <option value="found">Found</option>
+          <option value="lost">Lost</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select [(ngModel)]="form.category" class="form-control">
+          <option value="">Select category</option>
+          @for (cat of categories; track cat.id) {
+            <option [value]="cat.id">{{ cat.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Location</label>
+        <select [(ngModel)]="form.location" class="form-control">
+          <option value="">Select location</option>
+          @for (loc of locations; track loc.id) {
+            <option [value]="loc.id">{{ loc.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Date Occurred</label>
+        <input type="date" [(ngModel)]="form.date_occurred" class="form-control" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Image (optional)</label>
+      <input type="file" (change)="onFileChange($event)" accept="image/*" class="form-control" />
+    </div>
+
+    <div class="form-actions">
+      <a routerLink="/items" class="btn-secondary">Cancel</a>
+      <button (click)="onSubmit()" [disabled]="loading" class="btn-primary">
+        {{ loading ? 'Saving...' : (isEdit ? 'Update Item' : 'Post Item') }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="page-container">
+  @if (error) { <div class="error-box">{{ error }}</div> }
+  @if (success) { <div class="success-box">{{ success }}</div> }
+
+  @if (item) {
+    <div class="detail-card">
+      <div class="detail-header">
+        <span class="badge" [class.found]="item.status === 'found'" [class.lost]="item.status === 'lost'">
+          {{ item.status | uppercase }}
+        </span>
+        <h1>{{ item.title }}</h1>
+        @if (item.is_claimed) { <span class="claimed-badge">CLAIMED</span> }
+      </div>
+
+      @if (item.image) {
+        <img [src]="'http://127.0.0.1:8000' + item.image" class="detail-image" alt="item" />
+      }
+
+      <div class="detail-meta">
+        <p><strong>Description:</strong> {{ item.description }}</p>
+        <p><strong>Category:</strong> {{ item.category_name }}</p>
+        <p><strong>Location:</strong> {{ item.location_name }}</p>
+        <p><strong>Posted by:</strong> {{ item.posted_by_username }}</p>
+        <p><strong>Date:</strong> {{ item.date_posted | date }}</p>
+      </div>
+
+      @if (auth.isLoggedIn() && !item.is_claimed) {
+        <div class="claim-section">
+          <h3>Claim this item</h3>
+          <textarea [(ngModel)]="claimMessage" rows="3" class="form-control"
+                    placeholder="Describe why this item belongs to you..."></textarea>
+          <button (click)="onClaim()" class="btn-primary">Submit Claim</button>
+        </div>
+      }
+
+      <div class="action-buttons">
+        <a routerLink="/items" class="btn-secondary">← Back</a>
+        <a [routerLink]="['/items', item.id, 'edit']" class="btn-outline">Edit</a>
+        <button (click)="onDelete()" class="btn-danger">Delete</button>
+      </div>
+    </div>
+  }
+</div>
