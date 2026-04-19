@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, generics, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -162,7 +162,12 @@ def location_list(request):
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
+class UserItemsView(generics.ListAPIView):
+    serializer_class = ItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        return Item.objects.filter(author=self.request.user)
 # ════════════════════════════════════════════════
 # Logout (blacklist refresh token)
 # ════════════════════════════════════════════════

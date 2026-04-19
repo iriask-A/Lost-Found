@@ -1,3 +1,4 @@
+
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import views
@@ -11,6 +12,7 @@ urlpatterns = [
 
     # Items — CRUD
     path('items/', views.ItemListCreateView.as_view(), name='item-list-create'),
+    path('items/my/', views.UserItemsView.as_view(), name='user-items'),
     path('items/<int:pk>/', views.ItemDetailView.as_view(), name='item-detail'),
     path('items/search/', views.search_items, name='item-search'),
 
