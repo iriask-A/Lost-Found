@@ -1,11 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
 
 
 class ActiveItemManager(models.Manager):
-    """Custom model manager — returns only active (unclaimed) items."""
+    """Returns items visible in public feeds.
+
+    Claimed items stay visible for one hour, then disappear automatically.
+    """
     def get_queryset(self):
-        return super().get_queryset().filter(is_claimed=False)
+        grace_period_start = timezone.now() - timedelta(hours=1)
+        return super().get_queryset().filter(
+            models.Q(is_claimed=False) |
+            models.Q(is_claimed=True, claimed_at__gte=grace_period_start)
+        )
 
 
 class Category(models.Model):
@@ -43,6 +52,7 @@ class Item(models.Model):
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='items')
     image = models.ImageField(upload_to='items/', blank=True, null=True)
     is_claimed = models.BooleanField(default=False)
+    claimed_at = models.DateTimeField(null=True, blank=True)
     date_posted = models.DateTimeField(auto_now_add=True)
     date_occurred = models.DateField(null=True, blank=True)
 

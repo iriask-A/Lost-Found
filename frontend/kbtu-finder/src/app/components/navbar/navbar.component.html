@@ -1,5 +1,8 @@
 <nav class="navbar">
-  <a routerLink="/" class="brand">🔍 KBTU Lost &amp; Found</a>
+  <a routerLink="/" class="brand">
+    <span class="brand-dot"></span>
+    <span>KBTU Lost &amp; Found</span>
+  </a>
   <div class="nav-links">
     <a routerLink="/items">Browse Items</a>
     @if (auth.isLoggedIn()) {

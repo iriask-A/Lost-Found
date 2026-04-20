@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-item-list',
+  standalone: true,
   templateUrl: './item-list.component.html',
   styleUrls: ['./item-list.component.css'],
   imports: [CommonModule, RouterModule,FormsModule],
@@ -25,14 +26,31 @@ export class ItemListComponent implements OnInit {
 
   constructor(private itemService: ItemService) {}
 
+  get lostCount(): number {
+    return this.items.filter(i => i.status === 'lost').length;
+  }
+
+  get foundCount(): number {
+    return this.items.filter(i => i.status === 'found').length;
+  }
+
   ngOnInit() {
-    this.loadCategories();
-    this.loadLocations();
+    this.itemService.bootstrapReferenceData().subscribe({
+      next: () => {
+        this.loadCategories();
+        this.loadLocations();
+      },
+      error: () => {
+        this.loadCategories();
+        this.loadLocations();
+      }
+    });
     this.loadItems();
   }
 
   loadItems() {
     this.loading = true;
+    this.error = '';
     this.itemService.getItems().subscribe({
       next: (data) => { this.items = data; this.loading = false; },
       error: () => { this.error = 'Failed to load items.'; this.loading = false; }

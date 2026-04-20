@@ -50,7 +50,14 @@ class LocationSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     posted_by_username = serializers.CharField(source='posted_by.username', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
-    location_name = serializers.CharField(source='location.name', read_only=True)
+    location_name = serializers.SerializerMethodField()
+
+    def get_location_name(self, obj):
+        if not obj.location:
+            return ''
+        if obj.location.floor:
+            return f"{obj.location.name} - Floor {obj.location.floor}"
+        return obj.location.name
 
     class Meta:
         model = Item
@@ -59,9 +66,9 @@ class ItemSerializer(serializers.ModelSerializer):
             'category', 'category_name',
             'location', 'location_name',
             'posted_by', 'posted_by_username',
-            'image', 'is_claimed', 'date_posted', 'date_occurred'
+            'image', 'is_claimed', 'claimed_at', 'date_posted', 'date_occurred'
         ]
-        read_only_fields = ['posted_by', 'date_posted']
+        read_only_fields = ['posted_by', 'date_posted', 'claimed_at']
 
 
 class ClaimRequestSerializer(serializers.ModelSerializer):

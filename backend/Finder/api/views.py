@@ -1,11 +1,17 @@
+
 from rest_framework import status, generics, permissions
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from datetime import timedelta
 
 from .models import Item, Category, Location, ClaimRequest
 from .serializers import (
@@ -37,12 +43,13 @@ def register_view(request):
 # ════════════════════════════════════════════════
 @api_view(['GET'])
 @permission_classes([AllowAny])
+@authentication_classes([])
 def search_items(request):
     param_serializer = ItemSearchSerializer(data=request.query_params)
     if not param_serializer.is_valid():
         return Response(param_serializer.errors, status=400)
 
-    qs = Item.objects.all()
+    qs = Item.active.all()
     data = param_serializer.validated_data
 
     if data.get('query'):
@@ -62,14 +69,22 @@ def search_items(request):
 # CBV 1 — Item List + Create (full CRUD starts here)
 # ════════════════════════════════════════════════
 class ItemListCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_authenticators(self):
+        if self.request.method == 'GET':
+            return []
+        return super().get_authenticators()
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get(self, request):
         """List all items (or only user's own if ?mine=true)"""
         if request.query_params.get('mine'):
             items = Item.objects.filter(posted_by=request.user).order_by('-date_posted')
         else:
-            items = Item.objects.all().order_by('-date_posted')
+            items = Item.active.all().order_by('-date_posted')
         serializer = ItemSerializer(items, many=True)
         return Response(serializer.data)
 
@@ -82,11 +97,28 @@ class ItemListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class MyItemsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        items = Item.objects.filter(posted_by=request.user).order_by('-date_posted')
+        serializer = ItemSerializer(items, many=True)
+        return Response(serializer.data)
+
+
 # ════════════════════════════════════════════════
 # CBV 2 — Item Detail: Retrieve, Update, Delete
 # ════════════════════════════════════════════════
 class ItemDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_authenticators(self):
+        if self.request.method == 'GET':
+            return []
+        return super().get_authenticators()
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get_object(self, pk):
         return get_object_or_404(Item, pk=pk)
@@ -114,6 +146,20 @@ class ItemDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class MarkItemClaimedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        item = get_object_or_404(Item, pk=pk)
+        if item.posted_by != request.user:
+            return Response({'error': 'Only the item owner can mark it as claimed.'}, status=403)
+
+        item.is_claimed = True
+        item.claimed_at = timezone.now()
+        item.save(update_fields=['is_claimed', 'claimed_at'])
+        return Response({'message': 'Item marked as claimed. It will disappear from public feed in 1 hour.'})
+
+
 # ════════════════════════════════════════════════
 # Claim Requests — list & create
 # ════════════════════════════════════════════════
@@ -139,6 +185,7 @@ class ClaimRequestView(APIView):
 # ════════════════════════════════════════════════
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
+@authentication_classes([])
 def category_list(request):
     if request.method == 'GET':
         cats = Category.objects.all()
@@ -152,6 +199,7 @@ def category_list(request):
 
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
+@authentication_classes([])
 def location_list(request):
     if request.method == 'GET':
         locs = Location.objects.all()
@@ -166,8 +214,77 @@ class UserItemsView(generics.ListAPIView):
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+<<<<<<< HEAD
     def get_queryset(self):
         return Item.objects.filter(author=self.request.user)
+=======
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])
+def bootstrap_reference_data(request):
+    """Create default categories and locations (idempotent)."""
+    category_names = [
+        'Electronics',
+        'Documents',
+        'Keys',
+        'Bags',
+        'Clothing',
+        'Accessories',
+        'Books & Notes',
+        'Other',
+    ]
+    for name in category_names:
+        Category.objects.get_or_create(name=name)
+
+    buildings = ['Tole Bi', 'Kazybek Bi', 'Panfilova', 'Abylay Khana']
+    for building in buildings:
+        for floor in range(1, 6):
+            Location.objects.get_or_create(
+                name=building,
+                building='KBTU Campus',
+                floor=str(floor),
+            )
+
+    if Item.objects.count() == 0:
+        demo_user, _ = User.objects.get_or_create(
+            username='demo_user',
+            defaults={'email': 'demo@kbtu.kz'}
+        )
+        if not demo_user.has_usable_password():
+            demo_user.set_password('demo12345')
+            demo_user.save(update_fields=['password'])
+
+        demo_category = Category.objects.filter(name='Electronics').first() or Category.objects.first()
+        demo_location = Location.objects.filter(name='Tole Bi', floor='2').first() or Location.objects.first()
+
+        if demo_category and demo_location:
+            Item.objects.create(
+                title='Apple AirPods Case',
+                description='White AirPods case found near Tole Bi staircase.',
+                status='found',
+                category=demo_category,
+                location=demo_location,
+                posted_by=demo_user,
+                date_occurred=timezone.now().date() - timedelta(days=1),
+            )
+            Item.objects.create(
+                title='Black Wallet',
+                description='Lost black wallet with student card, possibly near Panfilova floor 4.',
+                status='lost',
+                category=Category.objects.filter(name='Personal Items').first() or demo_category,
+                location=Location.objects.filter(name='Panfilova', floor='4').first() or demo_location,
+                posted_by=demo_user,
+                date_occurred=timezone.now().date(),
+            )
+
+    return Response({
+        'message': 'Reference data is ready.',
+        'categories_count': Category.objects.count(),
+        'locations_count': Location.objects.count(),
+    }, status=200)
+
+
+>>>>>>> eb8026e (some fixes)
 # ════════════════════════════════════════════════
 # Logout (blacklist refresh token)
 # ════════════════════════════════════════════════

@@ -1,5 +1,19 @@
 <div class="page-container">
   <h1 class="page-title">Browse Lost & Found Items</h1>
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-label">Total Active</span>
+      <strong>{{ items.length }}</strong>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Lost</span>
+      <strong>{{ lostCount }}</strong>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Found</span>
+      <strong>{{ foundCount }}</strong>
+    </div>
+  </div>
 
   <!-- Search/Filter Form — ngModel controls -->
   <div class="search-bar">
@@ -13,7 +27,7 @@
     <select [(ngModel)]="selectedLocation" class="form-control">
       <option value="">All Locations</option>
       @for (loc of locations; track loc.id) {
-        <option [value]="loc.id">{{ loc.name }}</option>
+        <option [value]="loc.id">{{ loc.name }} - Floor {{ loc.floor }}</option>
       }
     </select>
     <select [(ngModel)]="selectedStatus" class="form-control">
@@ -40,10 +54,11 @@
           }
           <div class="item-body">
             <h3>{{ item.title }}</h3>
-            <p>{{ item.description | slice:0:100 }}...</p>
+            <p>{{ item.description | slice:0:120 }}...</p>
             <div class="item-meta">
               <span>📁 {{ item.category_name }}</span>
               <span>📍 {{ item.location_name }}</span>
+              <span>🕒 {{ item.date_posted | date:'medium' }}</span>
             </div>
             <a [routerLink]="['/items', item.id]" class="btn-outline">View Details</a>
           </div>

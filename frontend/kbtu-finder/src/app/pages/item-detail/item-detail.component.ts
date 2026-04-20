@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-item-detail',
+  standalone: true,
   templateUrl: './item-detail.component.html',
   styleUrls: ['./item-detail.component.css'],
   imports: [CommonModule, RouterModule,FormsModule],
@@ -50,6 +51,20 @@ export class ItemDetailComponent implements OnInit {
     this.itemService.deleteItem(this.item.id).subscribe({
       next: () => this.router.navigate(['/items']),
       error: () => this.error = 'Failed to delete.'
+    });
+  }
+
+  onMarkClaimed() {
+    this.error = '';
+    this.success = '';
+    this.itemService.markClaimed(this.item.id).subscribe({
+      next: (res) => {
+        this.item.is_claimed = true;
+        this.success = res.message;
+      },
+      error: (err) => {
+        this.error = err?.error?.error || 'Failed to mark item as claimed.';
+      }
     });
   }
 }

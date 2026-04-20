@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ItemService } from '../../services/item.service';
 import { Item, ClaimRequest } from '../../models/item.model';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
   templateUrl: './dashboard.component.html',
   imports: [CommonModule, RouterModule],
   styleUrls: ['./dashboard.component.css']
@@ -17,7 +19,11 @@ export class DashboardComponent implements OnInit {
   loading = false;
   error = '';
 
-  constructor(private itemService: ItemService, private router: Router) {}
+  constructor(
+    private itemService: ItemService,
+    private router: Router,
+    private auth: AuthService
+  ) {}
 
   ngOnInit() {
     this.loadMyItems();
@@ -26,9 +32,38 @@ export class DashboardComponent implements OnInit {
 
   loadMyItems() {
     this.loading = true;
+    this.error = '';
     this.itemService.getMyItems().subscribe({
-      next: (data) => { this.myItems = data; this.loading = false; },
-      error: () => { this.error = 'Failed to load your items.'; this.loading = false; }
+      next: (data) => {
+        if (data.length > 0) {
+          this.myItems = data;
+          this.loading = false;
+          return;
+        }
+
+        // Fallback path: filter from all items by current user id.
+        const currentUserId = this.auth.getCurrentUserId();
+        if (!currentUserId) {
+          this.myItems = [];
+          this.loading = false;
+          return;
+        }
+
+        this.itemService.getItems().subscribe({
+          next: (allItems) => {
+            this.myItems = allItems.filter(item => item.posted_by === currentUserId);
+            this.loading = false;
+          },
+          error: () => {
+            this.error = 'Could not resolve your items right now.';
+            this.loading = false;
+          }
+        });
+      },
+      error: (err) => {
+        this.error = err?.error?.detail || 'Failed to load your items. Please login again.';
+        this.loading = false;
+      }
     });
   }
 
