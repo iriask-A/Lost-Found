@@ -11,12 +11,15 @@ urlpatterns = [
 
     # Items — CRUD
     path('items/', views.ItemListCreateView.as_view(), name='item-list-create'),
+    path('items/mine/', views.MyItemsView.as_view(), name='my-items'),
     path('items/<int:pk>/', views.ItemDetailView.as_view(), name='item-detail'),
+    path('items/<int:pk>/mark-claimed/', views.MarkItemClaimedView.as_view(), name='item-mark-claimed'),
     path('items/search/', views.search_items, name='item-search'),
 
     # Supporting data
     path('categories/', views.category_list, name='categories'),
     path('locations/', views.location_list, name='locations'),
+    path('bootstrap-reference-data/', views.bootstrap_reference_data, name='bootstrap-reference-data'),
 
     # Claims
     path('claims/', views.ClaimRequestView.as_view(), name='claims'),

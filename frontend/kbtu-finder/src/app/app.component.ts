@@ -7,8 +7,10 @@ import { NavbarComponent } from './components/navbar/navbar.component'; // Adjus
   standalone: true,
   imports: [RouterOutlet, RouterModule, NavbarComponent],
   template: `
-    <app-navbar></app-navbar> <main class="container mt-4">
-      <router-outlet></router-outlet> </main>
+    <app-navbar></app-navbar>
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
   `,
   styleUrl: './app.css'
 })

@@ -35,7 +35,7 @@
         <select [(ngModel)]="form.location" class="form-control">
           <option value="">Select location</option>
           @for (loc of locations; track loc.id) {
-            <option [value]="loc.id">{{ loc.name }}</option>
+            <option [value]="loc.id">{{ loc.name }} - Floor {{ loc.floor }}</option>
           }
         </select>
       </div>

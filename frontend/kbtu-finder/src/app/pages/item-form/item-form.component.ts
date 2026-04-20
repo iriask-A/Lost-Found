@@ -5,9 +5,11 @@ import { Category, Location } from '../../models/item.model';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-item-form',
+  standalone: true,
   templateUrl: './item-form.component.html',
   styleUrls: ['./item-form.component.css'],
   imports: [CommonModule, RouterModule,FormsModule],
@@ -36,9 +38,28 @@ export class ItemFormComponent implements OnInit {
     private itemService: ItemService
   ) {}
 
+  private getErrorMessage(err: any): string {
+    if (typeof err?.error === 'string') return err.error;
+    if (err?.error?.title?.length) return err.error.title[0];
+    if (err?.error?.description?.length) return err.error.description[0];
+    if (err?.error?.category?.length) return err.error.category[0];
+    if (err?.error?.location?.length) return err.error.location[0];
+    if (err?.error?.date_occurred?.length) return err.error.date_occurred[0];
+    return 'Failed to save item. Please check the form fields.';
+  }
+
   ngOnInit() {
-    this.itemService.getCategories().subscribe(d => this.categories = d);
-    this.itemService.getLocations().subscribe(d => this.locations = d);
+    this.itemService.bootstrapReferenceData().subscribe({
+      next: () => {
+        this.itemService.getCategories().subscribe(d => this.categories = d);
+        this.itemService.getLocations().subscribe(d => this.locations = d);
+      },
+      error: () => {
+        // Fallback: still try loading existing reference data.
+        this.itemService.getCategories().subscribe(d => this.categories = d);
+        this.itemService.getLocations().subscribe(d => this.locations = d);
+      }
+    });
 
     this.itemId = Number(this.route.snapshot.paramMap.get('id'));
     if (this.itemId) {
@@ -59,6 +80,16 @@ export class ItemFormComponent implements OnInit {
   }
 
   onSubmit() {
+    this.error = '';
+    if (!this.form.title.trim() || !this.form.description.trim()) {
+      this.error = 'Title and description are required.';
+      return;
+    }
+    if (!this.form.category || !this.form.location) {
+      this.error = 'Please select both category and location.';
+      return;
+    }
+
     this.loading = true;
     const fd = new FormData();
     Object.entries(this.form).forEach(([k, v]) => fd.append(k, v));
@@ -68,11 +99,14 @@ export class ItemFormComponent implements OnInit {
       ? this.itemService.updateItem(this.itemId!, fd as any)
       : this.itemService.createItem(fd);
 
-    call.subscribe({
-      next: (item) => this.router.navigate(['/items', item.id]),
-      error: (err) => {
-        this.error = JSON.stringify(err.error);
+    call.pipe(
+      finalize(() => {
         this.loading = false;
+      })
+    ).subscribe({
+      next: () => this.router.navigate(['/dashboard']),
+      error: (err) => {
+        this.error = this.getErrorMessage(err);
       }
     });
   }

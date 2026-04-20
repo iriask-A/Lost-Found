@@ -36,6 +36,9 @@
       <div class="action-buttons">
         <a routerLink="/items" class="btn-secondary">← Back</a>
         <a [routerLink]="['/items', item.id, 'edit']" class="btn-outline">Edit</a>
+        @if (!item.is_claimed) {
+          <button (click)="onMarkClaimed()" class="btn-primary">Mark as Returned</button>
+        }
         <button (click)="onDelete()" class="btn-danger">Delete</button>
       </div>
     </div>
