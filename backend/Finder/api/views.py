@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+=======
+
+from rest_framework import status, generics, permissions
+from rest_framework.decorators import api_view, permission_classes
+>>>>>>> temp-fix
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -207,7 +213,17 @@ def location_list(request):
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
+class UserItemsView(generics.ListAPIView):
+    serializer_class = ItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    def get_queryset(self):
+        return Item.objects.filter(author=self.request.user)
+=======
+>>>>>>> temp-fix
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @authentication_classes([])
@@ -274,6 +290,10 @@ def bootstrap_reference_data(request):
     }, status=200)
 
 
+<<<<<<< HEAD
+=======
+>>>>>>> eb8026e (some fixes)
+>>>>>>> temp-fix
 # ════════════════════════════════════════════════
 # Logout (blacklist refresh token)
 # ════════════════════════════════════════════════
