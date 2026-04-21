@@ -5,6 +5,9 @@ import { ChatService, ChatMessage } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 
+const STORAGE_KEY = 'kbtu_chat_messages';
+const MAX_STORED = 200;
+
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -62,17 +65,17 @@ import { Subscription } from 'rxjs';
 
         <div class="chat-topbar">
           <div class="tb-channel">#general</div>
-          <div class="tb-count">{{ (chatSvc.messages$ | async)?.length || 0 }} messages</div>
+          <div class="tb-count">{{ displayMessages.length }} messages</div>
         </div>
 
         <div class="messages" #msgContainer>
-          @if ((chatSvc.messages$ | async)?.length === 0) {
+          @if (displayMessages.length === 0) {
             <div class="empty-chat">
               <div class="empty-glyph">◎</div>
               <p>No messages yet.<br>Say hello to start the conversation.</p>
             </div>
           }
-          @for (msg of (chatSvc.messages$ | async) || []; track msg.id; let i = $index) {
+          @for (msg of displayMessages; track msg.id) {
             <div class="msg-group" [class.own]="msg.is_own">
 
               @if (!msg.is_own) {
@@ -110,7 +113,6 @@ import { Subscription } from 'rxjs';
             name="msg"
             placeholder="Message #general…"
             (keydown.enter)="send()"
-            [disabled]="!message.trim() && false"
           >
           <button class="send-btn" (click)="send()" [disabled]="!message.trim()">
             <span>Send</span>
@@ -127,8 +129,6 @@ import { Subscription } from 'rxjs';
       display: grid; grid-template-columns: 260px 1fr;
       overflow: hidden;
     }
-
-    /* Sidebar */
     .sidebar {
       background: var(--espresso);
       display: flex; flex-direction: column;
@@ -155,31 +155,23 @@ import { Subscription } from 'rxjs';
     .you-status { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 9px; color: rgba(240,234,216,0.3); text-transform: capitalize; margin-top: 2px; }
     .you-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--warm); transition: background 0.3s; }
     .you-dot.conn { background: var(--green2); }
-
-    /* Main chat */
     .chat-main { display: flex; flex-direction: column; background: var(--cream); overflow: hidden; }
     .chat-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--sand); flex-shrink: 0; }
     .tb-channel { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--espresso); }
     .tb-count { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
-
     .messages { flex: 1; overflow-y: auto; padding: 24px 24px 16px; display: flex; flex-direction: column; gap: 4px; scroll-behavior: smooth; }
-
     .empty-chat { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.7; gap: 12px; }
     .empty-glyph { font-family: var(--font-display); font-size: 48px; color: var(--warm); }
-
     .msg-group { display: flex; align-items: flex-end; gap: 8px; max-width: 72%; animation: fadeUp 0.2s ease both; }
     .msg-group.own { align-self: flex-end; flex-direction: row-reverse; }
     .msg-group:not(.own) { align-self: flex-start; }
-
     .msg-av { width: 28px; height: 28px; border-radius: 50%; background: var(--espresso); color: var(--cream); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 11px; font-weight: 700; flex-shrink: 0; }
     .msg-av.own-av { background: var(--cork); color: var(--espresso); }
-
     .msg-content { display: flex; flex-direction: column; gap: 3px; max-width: 100%; }
     .msg-meta { display: flex; gap: 8px; align-items: baseline; padding: 0 2px; }
     .msg-user { font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: var(--cork); }
     .msg-time { font-family: var(--font-mono); font-size: 9px; color: var(--muted); }
     .own-meta { justify-content: flex-end; }
-
     .msg-bubble {
       background: var(--sand); border: 1px solid var(--border);
       padding: 9px 13px; border-radius: 4px 4px 4px 0;
@@ -187,8 +179,6 @@ import { Subscription } from 'rxjs';
       max-width: 100%; word-break: break-word;
     }
     .msg-group.own .msg-bubble { background: var(--espresso); color: var(--cream); border-color: transparent; border-radius: 4px 4px 0 4px; }
-
-    /* Input */
     .chat-input-row { display: flex; gap: 0; padding: 16px 24px; border-top: 1px solid var(--border); background: var(--sand); flex-shrink: 0; }
     .chat-input { flex: 1; background: var(--cream); border: 1px solid var(--border); border-right: none; color: var(--ink); padding: 11px 16px; font-size: 13px; outline: none; border-radius: 3px 0 0 3px; transition: border-color 0.15s; }
     .chat-input:focus { border-color: var(--cork); }
@@ -203,6 +193,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('msgContainer') msgContainer!: ElementRef;
   message = '';
   username = '';
+
+  // The component owns its display list — no touching service internals
+  displayMessages: ChatMessage[] = [];
+
   private sub!: Subscription;
   private shouldScroll = false;
 
@@ -210,8 +204,27 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit() {
     this.username = this.auth.currentUser?.username || 'Anonymous';
+
+    // Step 1: show cached history instantly, before WS even connects
+    this.displayMessages = this.loadFromStorage();
+    this.shouldScroll = true;
+
+    // Step 2: open WebSocket
     this.chatSvc.connect(this.username);
-    this.sub = this.chatSvc.messages$.subscribe(() => { this.shouldScroll = true; });
+
+    // Step 3: whenever the service emits live messages, merge with cache
+    this.sub = this.chatSvc.messages$.subscribe(liveMessages => {
+      if (liveMessages.length === 0) return; // service reset — keep our cache
+
+      // Deduplicate: keep cached messages whose IDs aren't in the live stream,
+      // then append the full live stream behind them
+      const liveIds = new Set(liveMessages.map(m => m.id));
+      const cachedOnly = this.displayMessages.filter(m => !liveIds.has(m.id));
+      this.displayMessages = [...cachedOnly, ...liveMessages].slice(-MAX_STORED);
+
+      this.saveToStorage(this.displayMessages);
+      this.shouldScroll = true;
+    });
   }
 
   ngAfterViewChecked() {
@@ -238,5 +251,29 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   ngOnDestroy() {
     this.chatSvc.disconnect();
     this.sub?.unsubscribe();
+  }
+
+  // ── localStorage helpers ─────────────────────────────────────────────────
+
+  private loadFromStorage(): ChatMessage[] {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const saved: ChatMessage[] = JSON.parse(raw);
+      if (!Array.isArray(saved)) return [];
+      // Re-flag is_own for whoever is currently logged in
+      return saved.map(m => ({ ...m, is_own: m.username === this.username }));
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+      return [];
+    }
+  }
+
+  private saveToStorage(messages: ChatMessage[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_STORED)));
+    } catch {
+      localStorage.removeItem(STORAGE_KEY); // quota exceeded — reset gracefully
+    }
   }
 }

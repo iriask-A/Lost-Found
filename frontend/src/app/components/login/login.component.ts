@@ -65,7 +65,20 @@ import { AuthService } from '../../services/auth.service';
               </div>
               <div class="fg">
                 <label>KBTU Email</label>
-                <input type="email" [(ngModel)]="regData.email" name="email" placeholder="someone@kbtu.kz">
+                <div class="email-input-wrapper">
+                  <input
+                    type="text"
+                    [(ngModel)]="emailPrefix"
+                    name="emailPrefix"
+                    placeholder="someone"
+                    (ngModelChange)="syncEmail()"
+                    [class.invalid]="emailPrefix && !isEmailValid()"
+                  >
+                  <span class="email-suffix">&#64;kbtu.kz</span>
+                </div>
+                @if (emailPrefix && !isEmailValid()) {
+                  <span class="field-hint error-hint">Only letters, numbers, dots, underscores and hyphens allowed.</span>
+                }
               </div>
               <div class="fg">
                 <label>Password</label>
@@ -121,9 +134,19 @@ import { AuthService } from '../../services/auth.service';
     .fg { margin-bottom: 16px; }
     .fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .fg label { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-    .fg input { width: 100%; background: var(--cream); border: 1px solid var(--border); color: var(--ink); padding: 9px 12px; border-radius: 3px; font-size: 13px; outline: none; transition: border-color 0.15s; }
+    .fg input { width: 100%; background: var(--cream); border: 1px solid var(--border); color: var(--ink); padding: 9px 12px; border-radius: 3px; font-size: 13px; outline: none; transition: border-color 0.15s; box-sizing: border-box; }
     .fg input:focus { border-color: var(--cork); }
     .fg input::placeholder { color: var(--warm); }
+
+    /* Split email input */
+    .email-input-wrapper { display: flex; align-items: stretch; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; background: var(--cream); transition: border-color 0.15s; }
+    .email-input-wrapper:focus-within { border-color: var(--cork); }
+    .email-input-wrapper input { border: none; border-radius: 0; flex: 1; min-width: 0; background: transparent; }
+    .email-input-wrapper input.invalid { color: var(--rust); }
+    .email-suffix { display: flex; align-items: center; padding: 0 10px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: rgba(0,0,0,0.04); border-left: 1px solid var(--border); white-space: nowrap; user-select: none; }
+    .field-hint { display: block; font-family: var(--font-mono); font-size: 9px; margin-top: 5px; }
+    .error-hint { color: var(--rust); }
+
     .btn-submit { width: 100%; margin-top: 8px; padding: 12px; background: var(--espresso); color: var(--cream); border: none; border-radius: 3px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
     .btn-submit:hover:not(:disabled) { background: var(--brown); }
     .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -141,11 +164,24 @@ export class LoginComponent {
   loginData = { username: '', password: '' };
   regData = { username: '', email: '', password: '', first_name: '', last_name: '' };
 
+  /** Holds only the part before @kbtu.kz */
+  emailPrefix = '';
+
   constructor(private auth: AuthService, private router: Router) {
     if (this.auth.isLoggedIn) this.router.navigate(['/items']);
   }
 
   clearMsgs() { this.errorMsg = ''; this.successMsg = ''; }
+
+  /** Syncs the full email into regData whenever the prefix changes */
+  syncEmail() {
+    this.regData.email = this.emailPrefix ? `${this.emailPrefix}@kbtu.kz` : '';
+  }
+
+  /** Prefix must contain only safe email-local characters */
+  isEmailValid(): boolean {
+    return /^[a-zA-Z0-9._%+\-]+$/.test(this.emailPrefix);
+  }
 
   onLogin() {
     this.clearMsgs();
@@ -160,6 +196,7 @@ export class LoginComponent {
   onRegister() {
     this.clearMsgs();
     if (!this.regData.username || !this.regData.email || !this.regData.password) { this.errorMsg = 'Fill in all required fields.'; return; }
+    if (!this.emailPrefix || !this.isEmailValid()) { this.errorMsg = 'Please enter a valid @kbtu.kz email address.'; return; }
     this.loading = true;
     this.auth.register(this.regData).subscribe({
       next: () => this.router.navigate(['/items']),
