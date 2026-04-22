@@ -1,0 +1,350 @@
+{
+  "info": {
+    "_postman_id": "65710451-e67b-4228-9cf1-612119918b01",
+    "name": "Lost_Found_CRUD",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53688431",
+    "_collection_link": "https://go.postman.co/collection/53688431-65710451-e67b-4228-9cf1-612119918b01?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "get items",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/items/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "items",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/categories/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "categories",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search by query",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/items/search/?q=Laptop/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "items",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "Laptop/"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"student1\",\n    \"password\": \"pass1234\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/auth/login/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "auth",
+            "login",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create item",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2OTcxOTQ5LCJpYXQiOjE3NzY4ODU1NDksImp0aSI6IjJiNTU1MmY2Njc4NzQ0NTBhZWU2YjNiZDE2OGE1NzMwIiwidXNlcl9pZCI6Mn0.ZhgXzilCjlTo_TAv23msgp3BAAS3ACJUtj6VtXINFYM",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Charger\",\n    \"description\": \"With smile emoji\",\n    \"category_id\": 2,\n    \"location_id\": 3,\n    \"date_found\": \"2025-04-10\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/items/create/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "items",
+            "create",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "item by id",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2OTcxOTQ5LCJpYXQiOjE3NzY4ODU1NDksImp0aSI6IjJiNTU1MmY2Njc4NzQ0NTBhZWU2YjNiZDE2OGE1NzMwIiwidXNlcl9pZCI6Mn0.ZhgXzilCjlTo_TAv23msgp3BAAS3ACJUtj6VtXINFYM",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Charger\",\n    \"description\": \"With smile emoji\",\n    \"category_id\": 2,\n    \"location_id\": 3,\n    \"date_found\": \"2025-04-10\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/items/2/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "items",
+            "2",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get locations",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2OTcxOTQ5LCJpYXQiOjE3NzY4ODU1NDksImp0aSI6IjJiNTU1MmY2Njc4NzQ0NTBhZWU2YjNiZDE2OGE1NzMwIiwidXNlcl9pZCI6Mn0.ZhgXzilCjlTo_TAv23msgp3BAAS3ACJUtj6VtXINFYM",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Charger\",\n    \"description\": \"With smile emoji\",\n    \"category_id\": 2,\n    \"location_id\": 3,\n    \"date_found\": \"2025-04-10\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/locations/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "locations",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "change the data",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2OTcxOTQ5LCJpYXQiOjE3NzY4ODU1NDksImp0aSI6IjJiNTU1MmY2Njc4NzQ0NTBhZWU2YjNiZDE2OGE1NzMwIiwidXNlcl9pZCI6Mn0.ZhgXzilCjlTo_TAv23msgp3BAAS3ACJUtj6VtXINFYM",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"description\": \"With smile emoji!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/items/6/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "items",
+            "6",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "claim item",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2OTcxOTQ5LCJpYXQiOjE3NzY4ODU1NDksImp0aSI6IjJiNTU1MmY2Njc4NzQ0NTBhZWU2YjNiZDE2OGE1NzMwIiwidXNlcl9pZCI6Mn0.ZhgXzilCjlTo_TAv23msgp3BAAS3ACJUtj6VtXINFYM",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/items/5/claim/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "items",
+            "5",
+            "claim",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete item",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2OTcxOTQ5LCJpYXQiOjE3NzY4ODU1NDksImp0aSI6IjJiNTU1MmY2Njc4NzQ0NTBhZWU2YjNiZDE2OGE1NzMwIiwidXNlcl9pZCI6Mn0.ZhgXzilCjlTo_TAv23msgp3BAAS3ACJUtj6VtXINFYM",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"description\": \"With smile emoji!\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/items/7/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "items",
+            "7",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
